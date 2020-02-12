@@ -1,11 +1,19 @@
 package pl.przydan.library.model;
 
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import java.time.LocalDate;
 import java.util.Objects;
 
-
+@Entity
 public class Book {
+
+    @Id
+    @GeneratedValue(generator = "bookSeq")
+    @SequenceGenerator(name = "bookSeq", sequenceName = "book_seq", allocationSize = 1)
     private Long _id;
     private String author;
     private String title;

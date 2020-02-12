@@ -1,19 +1,17 @@
 package pl.przydan.library.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.przydan.library.model.Book;
 import pl.przydan.library.model.Fine;
 import pl.przydan.library.service.OrderService;
 
-import java.sql.ResultSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.ResponseEntity.badRequest;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 public class BookController {
@@ -32,14 +30,13 @@ public class BookController {
     @GetMapping(value = "/book/order/{title}", produces = "application/json")
     public ResponseEntity<Book> borrowBook(@PathVariable String title) {
         Optional<Book> book = orderService.borrowBook(title);
-        if (book.isPresent()) {
-            return ResponseEntity.ok(book.get());
-        }
-        return ResponseEntity.notFound().build();
-
-//        return orderService.borrowBook(title)
-//                .map(ResponseEntity::ok)
-//                .orElse(ResponseEntity.notFound().build());
+        return orderService.borrowBook(title)
+                .map(ResponseEntity :: ok)
+                .orElse(ResponseEntity.notFound().build());
+//        if (book.isPresent()) {
+//            return ok(book.get());
+//        }
+//        return notFound().build();
 
 //        return book.map(ResponseEntity :: ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -50,12 +47,9 @@ public class BookController {
     }
 
     @DeleteMapping("/book/delete/{id}")
-    public ResponseEntity<?> removeBook(@PathVariable Long id) {
-        boolean deleteBook = orderService.deleteBook(id);
-        if (deleteBook) {
-            return noContent().build();
-        }
-        return badRequest().body("Could not delete a book with id" + id);
+    public ResponseEntity<Void> removeBook(@PathVariable Long id) {
+        orderService.deleteBook(id);
+        return noContent().build();
     }
 
     @GetMapping(value = "book/return/{id}", produces = "application/json")
@@ -68,6 +62,6 @@ public class BookController {
 //        return ResponseEntity.ok().build();
         return orderService.returnBook(id)
                 .map(ResponseEntity :: ok)
-                .orElse(ResponseEntity.ok().build());
+                .orElse(ok().build());
     }
 }
